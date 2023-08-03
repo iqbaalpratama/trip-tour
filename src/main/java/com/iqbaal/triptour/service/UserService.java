@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -44,7 +46,23 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public UserResponse getUserById(String id){
+        User user = userRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with that id not found"));
+        return toUserResponse(user);
+    }
+
+    public List<UserResponse> getAllUser(){
+        List<User> users = userRepository.findAll();
+        return users.stream().map(this::toUserResponse).toList();
+    }
+
+
     public UserResponse getCurrentUser(User user){
+        return toUserResponse(user);
+    }
+
+    private UserResponse toUserResponse(User user){
         return UserResponse.builder()
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
