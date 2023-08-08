@@ -1,26 +1,6 @@
 package com.iqbaal.triptour.service;
 
-import com.iqbaal.triptour.entity.Trip;
-import com.iqbaal.triptour.entity.User;
-import com.iqbaal.triptour.exception.FileTypeNotValidException;
-import com.iqbaal.triptour.model.request.CreateTripRequest;
-import com.iqbaal.triptour.model.request.UpdateTripRequest;
-import com.iqbaal.triptour.model.response.TripResponse;
-import com.iqbaal.triptour.model.response.UserResponse;
-import com.iqbaal.triptour.repository.TripRepository;
-import com.iqbaal.triptour.security.BCrypt;
-import jakarta.transaction.Transactional;
-import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +10,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.iqbaal.triptour.entity.Trip;
+import com.iqbaal.triptour.entity.User;
+import com.iqbaal.triptour.exception.FileTypeNotValidException;
+import com.iqbaal.triptour.model.request.CreateTripRequest;
+import com.iqbaal.triptour.model.request.UpdateTripRequest;
+import com.iqbaal.triptour.model.response.TripResponse;
+import com.iqbaal.triptour.repository.TripRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class TripService {
