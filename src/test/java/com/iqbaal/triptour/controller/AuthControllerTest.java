@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iqbaal.triptour.entity.User;
 import com.iqbaal.triptour.model.request.LoginUserRequest;
+import com.iqbaal.triptour.model.response.TokenResponse;
 import com.iqbaal.triptour.model.response.WebResponse;
 import com.iqbaal.triptour.repository.UserRepository;
 import com.iqbaal.triptour.security.BCrypt;
@@ -14,10 +15,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -114,6 +117,18 @@ public class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(loginUserRequest))
         ).andExpectAll(
                 status().isOk()
-        );
+        ).andDo( result -> {
+            WebResponse<TokenResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+            assertNull(response.getErrors());
+            assertNotNull(response.getData().getToken());
+            assertNotNull(response.getData().getExpiresIn());
+
+            Optional<User> userDb = userRepository.findByEmail(user.getEmail());
+            if(userDb.isPresent()){
+                assertNotNull(userDb);
+                assertEquals(userDb.get().getToken(), response.getData().getToken());
+                assertEquals(1800, response.getData().getExpiresIn());
+            }
+        });
     }
 }

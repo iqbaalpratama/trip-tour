@@ -36,7 +36,7 @@ Response Body (Failed) :
 
 ## Login User
 
-Endpoint : POST /api/auth/login
+Endpoint : POST /api/v1/auth/login
 
 Request Body :
 
@@ -68,7 +68,7 @@ Response Body (Failed, 401) :
 
 ## Get All Users 
 
-Endpoint : GET /api/users/get-all
+Endpoint : GET /api/v1/users
 
 Response Body (Success) :
 
@@ -99,11 +99,7 @@ Response Body (Success) :
 
 ## Get User By Id
 
-Endpoint : GET /api/users/get
-
-Request Param :
-
-- id: String userId (Mandatory)
+Endpoint : GET /api/v1/users/{id}
 
 Response Body (Success) :
 
@@ -131,7 +127,7 @@ Response Body (Failed, 404) :
 
 ## Get User Current Login
 
-Endpoint : GET /api/users/current
+Endpoint : GET /api/v1/users/current
 
 Request Header :
 
@@ -163,7 +159,7 @@ Response Body (Failed, 401) :
 
 ## Update User
 
-Endpoint : PATCH /api/users/update
+Endpoint : PATCH /api/v1/users/update
 
 Request Header :
 
@@ -209,7 +205,7 @@ Response Body (Failed, 401) :
 
 ## Logout User
 
-Endpoint : DELETE /api/auth/logout
+Endpoint : DELETE /api/v1/auth/logout
 
 Request Header :
 

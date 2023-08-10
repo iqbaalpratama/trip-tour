@@ -44,7 +44,7 @@ Response Body (Failed) :
 
 ## Get All Trips
 
-Endpoint : GET /api/trips/get-all
+Endpoint : GET /api/trips
 
 Response Body (Success) :
 
@@ -68,11 +68,7 @@ Response Body (Success) :
 
 ## Get Trip By Id
 
-Endpoint : GET /api/trips/get
-
-Request Param :
-
-- id: String tripId (Mandatory)
+Endpoint : GET /api/trips/{id}
 
 Response Body (Success) :
 
@@ -103,15 +99,11 @@ Response Body (Failed, 404) :
 
 ## Update Trip
 
-Endpoint : PATCH /api/trips/update
+Endpoint : PATCH /api/trips/update/{id}
 
 Request Header :
 
 - X-API-TOKEN : Token (Mandatory)
-
-Request Param:
-
-- id : String tripId (Mandatory) 
 
 Request Body : (Form-Data)
 
@@ -163,15 +155,11 @@ Response Body (Failed, 404) :
 
 ## Delete Trip
 
-Endpoint : DELETE /api/trips/delete
+Endpoint : DELETE /api/trips/delete/{id}
 
 Request Header :
 
 - X-API-TOKEN : Token (Mandatory)
-
-Request Param:
-
-- id : String tripId (Mandatory) 
 
 Response Body (Success) :
 

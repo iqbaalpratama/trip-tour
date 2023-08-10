@@ -21,7 +21,6 @@ public class UserController {
     private UserService userService;
 
     @GetMapping(
-            path = "/get-all",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<List<UserResponse>> getAllUsers(){
@@ -30,10 +29,10 @@ public class UserController {
     }
 
     @GetMapping(
-            path = "/get",
+            path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<UserResponse> getUserById(@RequestParam String id){
+    public WebResponse<UserResponse> getUserById(@PathVariable String id){
         UserResponse userResponse = userService.getUserById(id);
         return WebResponse.<UserResponse>builder().data(userResponse).build();
     }
