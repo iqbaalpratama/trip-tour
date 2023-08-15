@@ -2,10 +2,10 @@ package com.iqbaal.triptour.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iqbaal.triptour.dto.request.LoginUserRequest;
+import com.iqbaal.triptour.dto.response.TokenResponse;
+import com.iqbaal.triptour.dto.response.WebResponse;
 import com.iqbaal.triptour.entity.User;
-import com.iqbaal.triptour.model.request.LoginUserRequest;
-import com.iqbaal.triptour.model.response.TokenResponse;
-import com.iqbaal.triptour.model.response.WebResponse;
 import com.iqbaal.triptour.repository.UserRepository;
 import com.iqbaal.triptour.security.BCrypt;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +15,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;

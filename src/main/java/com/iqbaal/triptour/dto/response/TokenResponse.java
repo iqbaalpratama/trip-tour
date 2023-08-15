@@ -1,4 +1,4 @@
-package com.iqbaal.triptour.model.response;
+package com.iqbaal.triptour.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

@@ -2,9 +2,9 @@ package com.iqbaal.triptour.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iqbaal.triptour.dto.request.RegisterUserRequest;
+import com.iqbaal.triptour.dto.response.WebResponse;
 import com.iqbaal.triptour.entity.User;
-import com.iqbaal.triptour.model.request.RegisterUserRequest;
-import com.iqbaal.triptour.model.response.WebResponse;
 import com.iqbaal.triptour.repository.UserRepository;
 import com.iqbaal.triptour.security.BCrypt;
 import org.junit.jupiter.api.BeforeEach;

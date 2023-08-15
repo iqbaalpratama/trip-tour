@@ -1,21 +1,23 @@
 package com.iqbaal.triptour.service;
 
-import com.iqbaal.triptour.entity.User;
-import com.iqbaal.triptour.model.request.RegisterUserRequest;
-import com.iqbaal.triptour.model.request.UpdateUserRequest;
-import com.iqbaal.triptour.model.response.UserResponse;
-import com.iqbaal.triptour.repository.UserRepository;
-import com.iqbaal.triptour.security.BCrypt;
-import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import com.iqbaal.triptour.dto.request.RegisterUserRequest;
+import com.iqbaal.triptour.dto.request.UpdateUserRequest;
+import com.iqbaal.triptour.dto.response.UserResponse;
+import com.iqbaal.triptour.entity.User;
+import com.iqbaal.triptour.repository.UserRepository;
+import com.iqbaal.triptour.security.BCrypt;
+import com.iqbaal.triptour.service.utils.UserMapper;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -27,51 +29,31 @@ public class UserService {
     private ValidationService validationService;
 
     @Transactional
-    public void registerUser(RegisterUserRequest registerUserRequest, String role){
+    public UserResponse registerUser(RegisterUserRequest registerUserRequest){
         validationService.validate(registerUserRequest);
 
         if(userRepository.existsByEmail(registerUserRequest.getEmail())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
         }
-        User user = new User();
-        user.setEmail(registerUserRequest.getEmail());
-        user.setFirstName(registerUserRequest.getFirstName());
-        user.setLastName(registerUserRequest.getLastName());
-        user.setAddress(registerUserRequest.getAddress());
-        user.setPhone(registerUserRequest.getPhone());
-        user.setGender(registerUserRequest.getGender());
-        user.setPassword(BCrypt.hashpw(registerUserRequest.getPassword(), BCrypt.gensalt()));
-        user.setRole(role);
-        user.setCreatedDate(ZonedDateTime.now());
+        User user = UserMapper.toUser(registerUserRequest);
         userRepository.save(user);
+        return UserMapper.toUserResponse(user);
     }
 
     public UserResponse getUserById(String id){
         User user = userRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with that id not found"));
-        return toUserResponse(user);
+        return UserMapper.toUserResponse(user);
     }
 
     public List<UserResponse> getAllUser(){
         List<User> users = userRepository.findAll();
-        return users.stream().map(this::toUserResponse).toList();
+        return users.stream().map(UserMapper::toUserResponse).toList();
     }
 
 
     public UserResponse getCurrentUser(User user){
-        return toUserResponse(user);
-    }
-
-    private UserResponse toUserResponse(User user){
-        return UserResponse.builder()
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .gender(user.getGender() == 'L' ? "Laki-laki" : "Perempuan")
-                .address(user.getAddress())
-                .phone(user.getPhone())
-                .role(user.getRole())
-                .build();
+        return UserMapper.toUserResponse(user);
     }
 
     public UserResponse update(User user, UpdateUserRequest updateUserRequest){
@@ -101,15 +83,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        return UserResponse.builder()
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .gender(user.getGender() == 'L' ? "Laki-laki" : "Perempuan")
-                .phone(user.getPhone())
-                .address(user.getAddress())
-                .role(user.getRole())
-                .build();
+        return UserMapper.toUserResponse(user);
     }
 
 }

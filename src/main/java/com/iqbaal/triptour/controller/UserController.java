@@ -1,10 +1,10 @@
 package com.iqbaal.triptour.controller;
 
+import com.iqbaal.triptour.dto.request.RegisterUserRequest;
+import com.iqbaal.triptour.dto.request.UpdateUserRequest;
+import com.iqbaal.triptour.dto.response.UserResponse;
+import com.iqbaal.triptour.dto.response.WebResponse;
 import com.iqbaal.triptour.entity.User;
-import com.iqbaal.triptour.model.request.RegisterUserRequest;
-import com.iqbaal.triptour.model.request.UpdateUserRequest;
-import com.iqbaal.triptour.model.response.UserResponse;
-import com.iqbaal.triptour.model.response.WebResponse;
 import com.iqbaal.triptour.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -42,9 +42,9 @@ public class UserController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<String> register(@RequestBody RegisterUserRequest registerUserRequest){
-        userService.registerUser(registerUserRequest, "employer");
-        return WebResponse.<String>builder().data("OK").build();
+    public WebResponse<UserResponse> register(@RequestBody RegisterUserRequest registerUserRequest){
+        UserResponse userResponse = userService.registerUser(registerUserRequest);
+        return WebResponse.<UserResponse>builder().data(userResponse).build();
     }
 
     @GetMapping(

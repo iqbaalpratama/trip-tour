@@ -1,16 +1,22 @@
 package com.iqbaal.triptour.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-@Entity
-@Table(name = "trips")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "trips")
 public class Trip {
     @Id
     @GeneratedValue

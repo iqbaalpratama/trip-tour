@@ -1,4 +1,4 @@
-package com.iqbaal.triptour.model.request;
+package com.iqbaal.triptour.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

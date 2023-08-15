@@ -1,10 +1,5 @@
 package com.iqbaal.triptour.service;
 
-import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -13,25 +8,27 @@ import java.util.UUID;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.iqbaal.triptour.dto.request.CreateTripRequest;
+import com.iqbaal.triptour.dto.request.UpdateTripRequest;
+import com.iqbaal.triptour.dto.response.TripResponse;
 import com.iqbaal.triptour.entity.Trip;
 import com.iqbaal.triptour.entity.User;
 import com.iqbaal.triptour.exception.FileTypeNotValidException;
-import com.iqbaal.triptour.model.request.CreateTripRequest;
-import com.iqbaal.triptour.model.request.UpdateTripRequest;
-import com.iqbaal.triptour.model.response.TripResponse;
+import com.iqbaal.triptour.exception.ResourceNotFoundException;
 import com.iqbaal.triptour.repository.TripRepository;
+import com.iqbaal.triptour.service.utils.UploadFile;
 
 import jakarta.transaction.Transactional;
 
 @Service
 public class TripService {
 
-    private final Path root = Paths.get("uploads");
     private final List<String> typeImage = Arrays.asList(new String[]{"png", "jpg"});
     private final List<String> typeVideo = Arrays.asList(new String[]{"mp4", "mkv", "avi"});
     private final List<String> typeTnc = Arrays.asList(new String[]{"docx", "doc", "txt", "pdf"});
@@ -42,13 +39,9 @@ public class TripService {
     @Autowired
     private ValidationService validationService;
 
-    public void initUpload() {
-        try {
-            Files.createDirectories(root);
-        } catch (IOException e) {
-            throw new RuntimeException("Could not initialize folder for upload!");
-        }
-    }
+    @Autowired
+    private UploadFile uploadFile;
+
 
     public List<TripResponse> getAllTrips(){
         List<Trip> trips = tripRepository.findAll();
@@ -62,7 +55,7 @@ public class TripService {
     }
 
     @Transactional
-    public void create(User user, CreateTripRequest createTripRequest, MultipartFile image, MultipartFile video, MultipartFile tnc) throws FileTypeNotValidException {
+    public TripResponse create(User user, CreateTripRequest createTripRequest, MultipartFile image, MultipartFile video, MultipartFile tnc) throws FileTypeNotValidException {
         validationService.validate(createTripRequest);
         if(!typeImage.contains(FilenameUtils.getExtension(image.getOriginalFilename()))){
             throw new FileTypeNotValidException("Image file type is not valid");
@@ -87,11 +80,12 @@ public class TripService {
         trip.setTnc(tnc.getOriginalFilename());
         trip.setStatus(createTripRequest.getStatus());
 
-        saveFile(image);
-        saveFile(tnc);
-        saveFile(video);
+        uploadFile.saveFile(image);
+        uploadFile.saveFile(tnc);
+        uploadFile.saveFile(video);
 
         tripRepository.save(trip);
+        return toTripResponse(trip);
 
     }
 
@@ -125,33 +119,33 @@ public class TripService {
             if(!typeImage.contains(FilenameUtils.getExtension(image.getOriginalFilename()))){
                 throw new FileTypeNotValidException("Image file type is not valid");
             };
-            if(!deleteFile(trip.getImage())){
+            if(!uploadFile.deleteFile(trip.getImage())){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image can't be edited");
             };
             trip.setImage(image.getOriginalFilename());
-            saveFile(image);
+            uploadFile.saveFile(image);
         }
 
         if(Objects.nonNull(video)){
             if(!typeVideo.contains(FilenameUtils.getExtension(video.getOriginalFilename()))){
                 throw new FileTypeNotValidException("Video file type is not valid");
             };
-            if(!deleteFile(trip.getVideo())){
+            if(!uploadFile.deleteFile(trip.getVideo())){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Video can't be edited");
             };
             trip.setVideo(video.getOriginalFilename());
-            saveFile(video);
+            uploadFile.saveFile(video);
         }
 
         if(Objects.nonNull(tnc)){
             if(!typeTnc.contains(FilenameUtils.getExtension(tnc.getOriginalFilename()))){
                 throw new FileTypeNotValidException("TnC file type is not valid");
             };
-            if(!deleteFile(trip.getTnc())){
+            if(!uploadFile.deleteFile(trip.getTnc())){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "TnC can't be edited");
             };
             trip.setTnc(tnc.getOriginalFilename());
-            saveFile(tnc);
+            uploadFile.saveFile(tnc);
         }
         trip.setUser(user);
         tripRepository.save(trip);
@@ -161,31 +155,24 @@ public class TripService {
     public void delete(User user, String id){
         Trip trip = tripRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trip with that id not found"));
-        deleteFile(trip.getImage());
-        deleteFile(trip.getVideo());
-        deleteFile(trip.getTnc());
+        uploadFile.deleteFile(trip.getImage());
+        uploadFile.deleteFile(trip.getVideo());
+        uploadFile.deleteFile(trip.getTnc());
         tripRepository.delete(trip);
     }
 
 
-    private void saveFile(MultipartFile file){
-        try {
-            Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()));
-        } catch (Exception e) {
-            if (e instanceof FileAlreadyExistsException) {
-                throw new RuntimeException("A file of that name already exists.");
-            }
-            throw new RuntimeException(e.getMessage());
+    public Resource getResource(String id, String fileType) throws ResourceNotFoundException{
+        Trip trip = tripRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trip with that id not found"));
+        
+        if(!fileType.equals("image") && !fileType.equals("video") && !fileType.equals("tnc")){
+                throw new ResourceNotFoundException("Resource type is not found");
         }
-    };
 
-    private boolean deleteFile(String filename) {
-        try {
-            Path file = root.resolve(filename);
-            return Files.deleteIfExists(file);
-        } catch (IOException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
-        }
+        String fileName = fileType.equals("image") ? trip.getImage() : fileType.equals("video") ? trip.getVideo() : fileType.equals("image") ? trip.getTnc() : "";
+        Resource resource = uploadFile.loadFileAsResource(fileName);
+        return resource;
     }
 
     private TripResponse toTripResponse(Trip trip){
@@ -196,21 +183,9 @@ public class TripService {
                 .quota(trip.getQuota())
                 .noOfDays(trip.getNoOfDays())
                 .status(trip.getStatus())
-                .imagePath(loadPathFile(trip.getImage()))
-                .videoPath(loadPathFile(trip.getVideo()))
-                .tncPath(loadPathFile(trip.getTnc()))
+                .imagePath(uploadFile.loadPathFile(trip.getImage()))
+                .videoPath(uploadFile.loadPathFile(trip.getVideo()))
+                .tncPath(uploadFile.loadPathFile(trip.getTnc()))
                 .build();
-    }
-
-    private String loadPathFile(String filename) {
-        if(filename == "" || filename == null){
-            return "";
-        }
-        try {
-            Path file = root.resolve(filename);
-            return  file.toAbsolutePath().toString();
-        } catch (Exception e) {
-            throw new RuntimeException("Error: " + e.getMessage());
-        }
     }
 }

@@ -1,9 +1,9 @@
 package com.iqbaal.triptour.controller;
 
+import com.iqbaal.triptour.dto.request.LoginUserRequest;
+import com.iqbaal.triptour.dto.response.TokenResponse;
+import com.iqbaal.triptour.dto.response.WebResponse;
 import com.iqbaal.triptour.entity.User;
-import com.iqbaal.triptour.model.request.LoginUserRequest;
-import com.iqbaal.triptour.model.response.TokenResponse;
-import com.iqbaal.triptour.model.response.WebResponse;
 import com.iqbaal.triptour.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

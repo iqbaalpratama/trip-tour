@@ -1,8 +1,8 @@
 package com.iqbaal.triptour.service;
 
+import com.iqbaal.triptour.dto.request.LoginUserRequest;
+import com.iqbaal.triptour.dto.response.TokenResponse;
 import com.iqbaal.triptour.entity.User;
-import com.iqbaal.triptour.model.request.LoginUserRequest;
-import com.iqbaal.triptour.model.response.TokenResponse;
 import com.iqbaal.triptour.repository.UserRepository;
 import com.iqbaal.triptour.security.BCrypt;
 import jakarta.transaction.Transactional;

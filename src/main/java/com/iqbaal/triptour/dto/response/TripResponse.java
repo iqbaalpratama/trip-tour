@@ -1,8 +1,5 @@
-package com.iqbaal.triptour.model.request;
+package com.iqbaal.triptour.dto.response;
 
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,23 +9,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateTripRequest {
-    @NotBlank
+public class TripResponse {
+
     private String name;
 
-    @NotBlank
     private String city;
 
-    @NotNull
     private Integer price;
 
-    @NotNull
     private Integer quota;
 
-    @NotNull
     private Integer noOfDays;
 
-    @NotBlank
     private String status;
+
+    private String imagePath;
+
+    private String videoPath;
+
+    private String tncPath;
 
 }

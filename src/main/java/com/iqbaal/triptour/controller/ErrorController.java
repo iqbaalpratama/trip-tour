@@ -1,7 +1,9 @@
 package com.iqbaal.triptour.controller;
 
+import com.iqbaal.triptour.dto.response.WebResponse;
 import com.iqbaal.triptour.exception.FileTypeNotValidException;
-import com.iqbaal.triptour.model.response.WebResponse;
+import com.iqbaal.triptour.exception.ResourceNotFoundException;
+
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,5 +36,10 @@ public class ErrorController {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<WebResponse<String>> handleMaxSizeException(MaxUploadSizeExceededException exception) {
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
+                .body(WebResponse.<String>builder().errors(exception.getMessage()).build());}
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<WebResponse<String>> handleResourceNotFoundException(ResourceNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(WebResponse.<String>builder().errors(exception.getMessage()).build());}
 }
