@@ -100,7 +100,6 @@ public class UserControllerTest {
         user.setAddress("Jalan Anggur 3 Jakarta");
         user.setPhone("081234567890");
         user.setPassword(BCrypt.hashpw("rahasia", BCrypt.gensalt()));
-        user.setRole("employer");
         user.setCreatedDate(ZonedDateTime.now());
         userRepository.save(user);
 

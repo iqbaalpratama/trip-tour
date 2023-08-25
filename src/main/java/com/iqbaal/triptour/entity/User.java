@@ -7,8 +7,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @Setter
@@ -16,7 +24,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails{
     @Id
     @GeneratedValue
     private UUID id;
@@ -26,12 +34,6 @@ public class User {
 
     @Column(nullable = false)
     private String password;
-
-    @Column(unique = true, nullable = true)
-    private String token;
-
-    @Column(nullable = true)
-    private Long tokenExpiredAt;
 
     @Column(nullable = false)
     private String firstName;
@@ -49,11 +51,50 @@ public class User {
     private String address;
 
     @Column(nullable = false)
-    private String role;
-
-    @Column(nullable = false)
     protected ZonedDateTime createdDate;
 
     @OneToMany(mappedBy = "user")
     private List<Trip> trips;
+
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles", 
+             joinColumns = @JoinColumn(name = "user_id"),
+             inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+            .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+            .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

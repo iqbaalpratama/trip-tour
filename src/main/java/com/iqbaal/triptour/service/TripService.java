@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,9 @@ import com.iqbaal.triptour.repository.TripRepository;
 import com.iqbaal.triptour.service.utils.UploadFile;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Service
 public class TripService {
 
@@ -33,14 +34,9 @@ public class TripService {
     private final List<String> typeVideo = Arrays.asList(new String[]{"mp4", "mkv", "avi"});
     private final List<String> typeTnc = Arrays.asList(new String[]{"docx", "doc", "txt", "pdf"});
 
-    @Autowired
-    private TripRepository tripRepository;
-
-    @Autowired
-    private ValidationService validationService;
-
-    @Autowired
-    private UploadFile uploadFile;
+    private final TripRepository tripRepository;
+    private final ValidationService validationService;
+    private final UploadFile uploadFile;
 
 
     public List<TripResponse> getAllTrips(){

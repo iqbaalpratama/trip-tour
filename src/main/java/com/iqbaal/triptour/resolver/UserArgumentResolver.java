@@ -33,9 +33,9 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
         }
         User user = userRepository.findByToken(token).
                 orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized"));
-        if(System.currentTimeMillis() > user.getTokenExpiredAt()){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is expired. You should login again");
-        }
+        // if(System.currentTimeMillis() > user.getTokenExpiredAt()){
+        //     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is expired. You should login again");
+        // }
         return user;
     }
 }

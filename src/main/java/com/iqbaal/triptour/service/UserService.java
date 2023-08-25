@@ -4,12 +4,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.iqbaal.triptour.dto.request.RegisterUserRequest;
 import com.iqbaal.triptour.dto.request.UpdateUserRequest;
 import com.iqbaal.triptour.dto.response.UserResponse;
 import com.iqbaal.triptour.entity.User;
@@ -18,27 +19,14 @@ import com.iqbaal.triptour.security.BCrypt;
 import com.iqbaal.triptour.service.utils.UserMapper;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Service
-public class UserService {
+public class UserService implements UserDetailsService{
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ValidationService validationService;
-
-    @Transactional
-    public UserResponse registerUser(RegisterUserRequest registerUserRequest){
-        validationService.validate(registerUserRequest);
-
-        if(userRepository.existsByEmail(registerUserRequest.getEmail())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
-        }
-        User user = UserMapper.toUser(registerUserRequest);
-        userRepository.save(user);
-        return UserMapper.toUserResponse(user);
-    }
+    private final UserRepository userRepository;
+    private final ValidationService validationService;
 
     public UserResponse getUserById(String id){
         User user = userRepository.findById(UUID.fromString(id))
@@ -56,6 +44,7 @@ public class UserService {
         return UserMapper.toUserResponse(user);
     }
 
+    @Transactional
     public UserResponse update(User user, UpdateUserRequest updateUserRequest){
         validationService.validate(updateUserRequest);
 
@@ -86,4 +75,11 @@ public class UserService {
         return UserMapper.toUserResponse(user);
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + username));
+
+        return user;
+    }
 }

@@ -70,7 +70,6 @@ public class AuthControllerTest {
         user.setAddress("Jalan Anggur 3 Jakarta");
         user.setPhone("081234567890");
         user.setPassword(BCrypt.hashpw("rahasia", BCrypt.gensalt()));
-        user.setRole("employer");
         user.setCreatedDate(ZonedDateTime.now());
         userRepository.save(user);
 
@@ -101,7 +100,6 @@ public class AuthControllerTest {
         user.setAddress("Jalan Anggur 3 Jakarta");
         user.setPhone("081234567890");
         user.setPassword(BCrypt.hashpw("rahasia", BCrypt.gensalt()));
-        user.setRole("employer");
         user.setCreatedDate(ZonedDateTime.now());
         userRepository.save(user);
 
@@ -125,7 +123,6 @@ public class AuthControllerTest {
             Optional<User> userDb = userRepository.findByEmail(user.getEmail());
             if(userDb.isPresent()){
                 assertNotNull(userDb);
-                assertEquals(userDb.get().getToken(), response.getData().getToken());
                 assertEquals(1800, response.getData().getExpiresIn());
             }
         });

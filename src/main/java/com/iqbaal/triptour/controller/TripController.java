@@ -1,5 +1,22 @@
 package com.iqbaal.triptour.controller;
 
+import java.util.List;
+
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.iqbaal.triptour.dto.request.CreateTripRequest;
 import com.iqbaal.triptour.dto.request.UpdateTripRequest;
 import com.iqbaal.triptour.dto.response.TripResponse;
@@ -8,26 +25,20 @@ import com.iqbaal.triptour.entity.User;
 import com.iqbaal.triptour.exception.FileTypeNotValidException;
 import com.iqbaal.triptour.exception.ResourceNotFoundException;
 import com.iqbaal.triptour.service.TripService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/trips")
 public class TripController {
 
-        @Autowired
-        private TripService tripService;
+        private final TripService tripService;
 
         @GetMapping(
                 produces = MediaType.APPLICATION_JSON_VALUE
         )
+        @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYER')")
         public WebResponse<List<TripResponse>> getAllTrips(){
         List<TripResponse> tripResponses = tripService.getAllTrips();
         return WebResponse.<List<TripResponse>>builder().data(tripResponses).build();
@@ -37,6 +48,7 @@ public class TripController {
                 path = "/{id}",
                 produces = MediaType.APPLICATION_JSON_VALUE
         )
+        @PreAuthorize("hasRole('CUSTOMER') or hasRole('EMPLOYER')")
         public WebResponse<TripResponse> getTripById(@PathVariable String id){
         TripResponse tripResponse = tripService.getById(id);
         return WebResponse.<TripResponse>builder().data(tripResponse).build();
@@ -48,6 +60,7 @@ public class TripController {
                 consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
                 produces = MediaType.APPLICATION_JSON_VALUE
         )
+        @PreAuthorize("hasRole('EMPLOYER')")
         public WebResponse<TripResponse> create(
                 User user,
                 @RequestPart(value = "image", required = true) MultipartFile image,
@@ -64,6 +77,7 @@ public class TripController {
                 consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
                 produces = MediaType.APPLICATION_JSON_VALUE
         )
+        @PreAuthorize("hasRole('EMPLOYER')")
         public WebResponse<String> update(
                 User user,
                 @PathVariable String id,
@@ -80,6 +94,7 @@ public class TripController {
                 path = "/delete/{id}",
                 produces = MediaType.APPLICATION_JSON_VALUE
         )
+        @PreAuthorize("hasRole('EMPLOYER')")
         public WebResponse<String> delete(
                 User user,
                 @PathVariable String id

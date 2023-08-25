@@ -1,12 +1,10 @@
 package com.iqbaal.triptour.service.utils;
 
 import java.time.ZonedDateTime;
-import java.util.Objects;
 
 import com.iqbaal.triptour.dto.request.RegisterUserRequest;
 import com.iqbaal.triptour.dto.response.UserResponse;
 import com.iqbaal.triptour.entity.User;
-import com.iqbaal.triptour.security.BCrypt;
 
 public class UserMapper {
 
@@ -18,8 +16,7 @@ public class UserMapper {
         user.setAddress(registerUserRequest.getAddress());
         user.setPhone(registerUserRequest.getPhone());
         user.setGender(registerUserRequest.getGender());
-        user.setPassword(BCrypt.hashpw(registerUserRequest.getPassword(), BCrypt.gensalt()));
-        user.setRole( Objects.nonNull(registerUserRequest.getRole()) ? registerUserRequest.getRole() : "employer");
+        user.setPassword(registerUserRequest.getPassword());
         user.setCreatedDate(ZonedDateTime.now());
         return user;
     }
@@ -32,7 +29,6 @@ public class UserMapper {
                 .gender(user.getGender() == 'L' ? "Laki-laki" : "Perempuan")
                 .address(user.getAddress())
                 .phone(user.getPhone())
-                .role(user.getRole())
                 .build();
     }
 }

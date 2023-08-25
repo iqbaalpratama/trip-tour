@@ -1,5 +1,7 @@
 package com.iqbaal.triptour.dto.request;
 
+import java.util.Set;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -38,5 +40,5 @@ public class RegisterUserRequest {
     @Size(max = 100)
     private String address;
 
-    private String role;
+    private Set<String> role;
 }
